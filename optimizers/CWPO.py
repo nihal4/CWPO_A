@@ -30,7 +30,7 @@ def dynamic_hazard(t, omega, alpha, beta, p, cat_pos, hazard_pos):
     return alpha * distance + periodic_fluctuation
 
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=1.0, beta=0.5, omega_freq=0.1, sf=5.0, levy_lambda=1.5, p=2.0):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.8, beta=0.3, omega_freq=0.05, sf=2.5, levy_lambda=1.8, p=2.0):
     """
     Cat Water Phobia Optimizer (CWPO)
     objf: Objective function
@@ -119,3 +119,4 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=1.0, beta=0.5, omeg
     s.objfname = objf.__name__
 
     return s
+
