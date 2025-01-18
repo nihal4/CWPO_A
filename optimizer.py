@@ -8,6 +8,7 @@ from pathlib import Path
 import optimizers.PSO as pso
 import optimizers.MVO as mvo
 import optimizers.CWPO as CWPO
+import optimizers.GWO as gwo
 import optimizers.MFO as mfo
 import optimizers.CS as cs
 import optimizers.BAT as bat
@@ -65,6 +66,8 @@ def selector(algo, func_details, popSize, Iter):
         x = jaya.JAYA(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
     elif algo == "DE":
         x = de.DE(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
+    elif algo == "GWO":
+        x = gwo.GWO(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
     else:
         return null
     return x
