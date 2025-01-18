@@ -11,9 +11,18 @@ def initialize_population(num_cats, bounds):
 
 # Simulate environmental hazards
 def calculate_hazards(cat_pos, time, alpha, beta, omega):
-    hazard_source = [5 * np.sin(omega * time), 5 * np.cos(omega * time)]  # Hazard moves dynamically
-    distances = np.linalg.norm(cat_pos - hazard_source, axis=1)
+    # Restrict cat positions to the first 2 dimensions
+    cat_pos_2d = cat_pos[:, :2]
+    
+    # Define hazard source in 2D
+    hazard_source = np.array([5 * np.sin(omega * time), 5 * np.cos(omega * time)])
+    
+    # Calculate distances
+    distances = np.linalg.norm(cat_pos_2d - hazard_source, axis=1)
+    
+    # Compute hazards
     return alpha * (distances ** -1) + beta * np.cos(omega * time)
+
 
 
 # Update the position of stray cats using Levy flight
