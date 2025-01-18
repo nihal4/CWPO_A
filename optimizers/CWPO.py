@@ -32,7 +32,7 @@ def localized_search(cat_pos, resources, sf):
 
 
 # Optimization algorithm
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha, beta, omega_freq, sf, levy_lambda):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=1, beta=0.5, omega_freq=2 * np.pi / 10, sf=2, levy_lambda=1.5):
     """
     Cat Water Phobia Optimizer (CWPO)
     objf: Objective function
