@@ -10,14 +10,14 @@ import time
 from solution import solution
 
 
-def levy_flight(lam):
-    """Generate a Levy flight step."""
+def levy_flight(lam, scale=0.5):
     sigma = (np.math.gamma(1 + lam) * np.sin(np.pi * lam / 2) /
              (np.math.gamma((1 + lam) / 2) * lam * 2 ** ((lam - 1) / 2))) ** (1 / lam)
     u = np.random.normal(0, sigma, 1)
     v = np.random.normal(0, 1, 1)
-    step = u / abs(v) ** (1 / lam)
+    step = scale * (u / abs(v) ** (1 / lam))
     return step[0]
+
 
 
 def dynamic_hazard(t, omega, alpha, beta, p, cat_pos, hazard_pos):
@@ -30,7 +30,7 @@ def dynamic_hazard(t, omega, alpha, beta, p, cat_pos, hazard_pos):
     return alpha * distance + periodic_fluctuation
 
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.8, beta=0.3, omega_freq=0.05, sf=2.5, levy_lambda=1.8, p=2.0):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.8, beta=0.3, omega_freq=0.05, sf=2.5, levy_lambda=2, p=2.0):
     """
     Cat Water Phobia Optimizer (CWPO)
     objf: Objective function
