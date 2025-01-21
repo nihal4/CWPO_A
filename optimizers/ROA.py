@@ -61,10 +61,11 @@ def ROA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
                 Remora[j, :] = BestRemora - (
                     (random.random() * (BestRemora + Remora[m, :]) / 2) - Remora[m, :]
                 )  # Equation (1)
-
-        t += 1
         if t % 500 == 0:
             print(f"Iteration : {t}, best score : {Score}")
+            
+        t += 1
+        
         Prevgen.append(Remora.copy())
         Convergence_curve[t - 1] = Score
 
