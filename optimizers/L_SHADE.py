@@ -134,7 +134,7 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         Convergence_curve[l] = best_fitness
         
         if l+1 % 500 == 0:
-            print(["At iteration " + str(l) + " the best fitness is " + str(best_fitness)])
+            print(["At iteration " + str(l+1) + " the best fitness is " + str(best_fitness)])
     
     # Timer end
     timerEnd = time.time()
