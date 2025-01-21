@@ -37,18 +37,17 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         # Generate trial solutions
         trial_population = np.zeros((SearchAgents_no, dim))
         for i in range(SearchAgents_no):
-            # Select parent indices
-            # Select parent indices
+            # Select parent indices, ensuring that we do not sample more than available
             parent_count = min(SearchAgents_no, 3)  # Use the smaller of the two
             parent_indices = np.random.choice(SearchAgents_no, parent_count, replace=False)
 
-
-            # Select scaling factor and crossover rate
-            sample_size = min(memory_size, p_best_size)
-            if sample_size <= len(range(memory_size)):
-                memory_indices = random.sample(range(memory_size), sample_size)
+            # Ensure the mutant vector calculation handles fewer than 3 parents
+            if len(parent_indices) == 3:
+            mutant_vector = population[parent_indices[0]] + F * (population[parent_indices[1]] - population[parent_indices[2]])
             else:
-                memory_indices = random.sample(range(memory_size), memory_size)
+            # Handle case where fewer than 3 parents are selected, e.g., by using the same parent for mutation
+            mutant_vector = population[parent_indices[0]] + F * (population[parent_indices[0]] - population[parent_indices[0]])
+
                 
             p_best_F = np.mean([memory[idx]["F"] for idx in memory_indices])
             p_best_CR = np.mean([memory[idx]["CR"] for idx in memory_indices])
