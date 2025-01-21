@@ -92,39 +92,38 @@ def selector(algo, func_details, popSize, Iter):
 
 
 def run(optimizer, objectivefunc, NumOfRuns, params, export_flags):
-
     """
-    It serves as the main interface of the framework for running the experiments.
+    Main interface of the framework for running experiments.
 
     Parameters
     ----------
     optimizer : list
-        The list of optimizers names
+        The list of optimizer names
     objectivefunc : list
         The list of benchmark functions
     NumOfRuns : int
         The number of independent runs
-    params  : set
-        The set of parameters which are:
-        1. Size of population (PopulationSize)
-        2. The number of iterations (Iterations)
-    export_flags : set
-        The set of Boolean flags which are:
-        1. Export (Exporting the results in a file)
-        2. Export_details (Exporting the detailed results in files)
-        3. Export_convergence (Exporting the covergence plots)
-        4. Export_boxplot (Exporting the box plots)
+    params : dict
+        The set of parameters:
+            1. Size of population (PopulationSize)
+            2. Number of iterations (Iterations)
+    export_flags : dict
+        The set of Boolean flags:
+            1. Export_avg (Export the average results to a file)
+            2. Export_details (Export detailed results to files)
+            3. Export_convergence (Export convergence plots)
+            4. Export_boxplot (Export box plots)
 
     Returns
-    -----------
-    N/A
+    -------
+    None
     """
 
-    # Select general parameters for all optimizers (population size, number of iterations) ....
+    # General parameters for all optimizers
     PopulationSize = params["PopulationSize"]
     Iterations = params["Iterations"]
 
-    # Export results ?
+    # Export flags
     Export = export_flags["Export_avg"]
     Export_details = export_flags["Export_details"]
     Export_convergence = export_flags["Export_convergence"]
@@ -133,68 +132,62 @@ def run(optimizer, objectivefunc, NumOfRuns, params, export_flags):
     Flag = False
     Flag_details = False
 
-    # CSV Header for for the cinvergence
-    CnvgHeader = []
+    # CSV Header for the convergence
+    CnvgHeader = [f"Iter{l + 1}" for l in range(Iterations)]
 
     results_directory = time.strftime("%Y-%m-%d-%H-%M-%S") + "/"
     Path(results_directory).mkdir(parents=True, exist_ok=True)
 
-    for l in range(0, Iterations):
-        CnvgHeader.append("Iter" + str(l + 1))
-
-    for i in range(0, len(optimizer)):
-        for j in range(0, len(objectivefunc)):
+    for optimizer_name in optimizer:
+        for objective in objectivefunc:
             convergence = [0] * NumOfRuns
             executionTime = [0] * NumOfRuns
-            for k in range(0, NumOfRuns):
-                func_details = benchmarks.getFunctionDetails(objectivefunc[j])
-                x = selector(optimizer[i], func_details, PopulationSize, Iterations)
-                convergence[k] = x.convergence
+
+            for run_idx in range(NumOfRuns):
+                func_details = benchmarks.getFunctionDetails(objective)
+                x = selector(optimizer_name, func_details, PopulationSize, Iterations)
+                convergence[run_idx] = x.convergence
                 optimizerName = x.optimizer
                 objfname = x.objfname
-                if Export_details == True:
+
+                # Export detailed results
+                if Export_details:
                     ExportToFile = results_directory + "experiment_details.csv"
-                    with open(ExportToFile, "a", newline="\n") as out:
+                    with open(ExportToFile, "a", newline="") as out:
                         writer = csv.writer(out, delimiter=",")
-                        if (
-                            Flag_details == False
-                        ):  # just one time to write the header of the CSV file
-                            header = numpy.concatenate(
-                                [["Optimizer", "objfname", "ExecutionTime", "Individual"], CnvgHeader]
-                            )
+                        if not Flag_details:  # Write the header once
+                            header = ["Optimizer", "objfname", "ExecutionTime", "Individual"] + CnvgHeader
                             writer.writerow(header)
-                            Flag_details = True  # at least one experiment
-                        executionTime[k] = x.executionTime
-                        a = numpy.array([x.optimizer, x.objfname, x.executionTime, x.bestIndividual] + x.convergence.tolist(), dtype=object)
-                        writer.writerow(a)
-                    out.close()
+                            Flag_details = True
 
-            if Export == True:
-                ExportToFile = results_directory + "experiment.csv"
-                with open(ExportToFile, "a", newline="\n") as out:
-                    writer = csv.writer(out, delimiter=",")
-                    if Flag == False:  # Write the header only once
-                        header = ["Optimizer", "objfname", "Avg_Min", "Std_Min"]
-                        writer.writerow(header)
-                        Flag = True
-                        
-                    min_values = [min(run) for run in convergence]
-                    
-                    avg_min = numpy.mean(min_values)
-                    std_min = numpy.std(min_values)
-                    
-                    writer.writerow([optimizerName, objfname, avg_min, std_min])
-                out.close()
+                        executionTime[run_idx] = x.executionTime
+                        row = [x.optimizer, x.objfname, x.executionTime, x.bestIndividual] + x.convergence.tolist()
+                        writer.writerow(row)
 
-    #if Export_convergence == True:
-    #    conv_plot.run(results_directory, optimizer, objectivefunc, Iterations)
+                # Export summary results
+                if Export:
+                    ExportToFile = results_directory + "experiment.csv"
+                    with open(ExportToFile, "a", newline="") as out:
+                        writer = csv.writer(out, delimiter=",")
+                        if not Flag:  # Write the header once
+                            header = ["Optimizer", "objfname", "Avg_Min", "Std_Min"]
+                            writer.writerow(header)
+                            Flag = True
 
-    #if Export_boxplot == True:
-    #    box_plot.run(results_directory, optimizer, objectivefunc, Iterations)
+                        min_values = [min(run) for run in convergence]
+                        avg_min = numpy.mean(min_values)
+                        std_min = numpy.std(min_values)
+                        writer.writerow([optimizerName, objfname, avg_min, std_min])
 
-    if Flag == False:  # Faild to run at least one experiment
-        print(
-            "No Optomizer or Cost function is selected. Check lists of available optimizers and cost functions"
-        )
+    # Optional: Export convergence and box plots
+    if Export_convergence:
+        conv_plot.run(results_directory, optimizer, objectivefunc, Iterations)
 
-    print("Execution completed")
+    if Export_boxplot:
+        box_plot.run(results_directory, optimizer, objectivefunc, Iterations)
+
+    if not Flag:  # No experiment was executed
+        print("No optimizer or cost function selected. Check available optimizers and cost functions.")
+
+    print("Execution completed.")
+
