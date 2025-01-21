@@ -5,8 +5,13 @@ from solution import solution
 import time
 
 def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
+    # Ensure lb and ub are lists or arrays, not just scalars
+    if not isinstance(lb, (list, numpy.ndarray)):
+        lb = [lb] * dim
+    if not isinstance(ub, (list, numpy.ndarray)):
+        ub = [ub] * dim
 
-    # initialize the population
+    # Initialize the population
     Positions = numpy.zeros((SearchAgents_no, dim))
     for i in range(SearchAgents_no):
         Positions[i, :] = numpy.random.uniform(lb, ub, dim)
