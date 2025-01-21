@@ -38,7 +38,10 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         trial_population = np.zeros((SearchAgents_no, dim))
         for i in range(SearchAgents_no):
             # Select parent indices
-            parent_indices = np.random.choice(SearchAgents_no, 3, replace=False)
+            # Select parent indices
+            parent_count = min(SearchAgents_no, 3)  # Use the smaller of the two
+            parent_indices = np.random.choice(SearchAgents_no, parent_count, replace=False)
+
 
             # Select scaling factor and crossover rate
             sample_size = min(memory_size, p_best_size)
