@@ -100,6 +100,10 @@ def COA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
             Xbest = X[best_idx].copy()
 
         # Record convergence
+
+        if t % 500 == 0:
+            print(f'At iteration {t} the best solution fitness is {Best_FF}')
+            
         convergence_curve[t - 1] = fbest
 
     # Stop the timer
