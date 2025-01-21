@@ -4,7 +4,7 @@ import math
 from solution import solution
 import time
 
-def LSHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
+def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     """
     LSHADE (Linear Success-History based Adaptive Differential Evolution) implementation
     
