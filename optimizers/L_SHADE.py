@@ -3,7 +3,7 @@ import random
 import time
 from solution import solution
 
-def LSHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
+def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     # Parameters
     memory_size = 5  # Size of the memory
     p_best_size = 5  # Number of best solutions considered for adaptation
