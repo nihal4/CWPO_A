@@ -4,23 +4,18 @@ import math
 from solution import solution
 import time
 
-def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
+def LSHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     """
     LSHADE (Linear Success-History based Adaptive Differential Evolution) implementation
-    
-    Parameters:
-    objf: objective function
-    lb: lower bound
-    ub: upper bound
-    dim: dimension of the problem
-    SearchAgents_no: initial population size
-    Max_iter: maximum number of iterations
     """
     
+    # Initialize solution object first
+    s = solution()
+    
     # Parameters
-    memory_size = 5  # Size of the memory
-    p_best_size = 5  # Number of best solutions considered for adaptation
-    H = 6  # Scaling factor for population reduction
+    memory_size = 5
+    p_best_size = 5
+    H = 6
     
     # Initialize memory
     memory = [{"F": 0.5, "CR": 0.5} for _ in range(memory_size)]
@@ -36,9 +31,7 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         Positions[:, i] = numpy.random.uniform(0, 1, SearchAgents_no) * (ub[i] - lb[i]) + lb[i]
     
     # Initialize fitness values
-    fitness_values = numpy.zeros(SearchAgents_no)
-    for i in range(SearchAgents_no):
-        fitness_values[i] = objf(Positions[i, :])
+    fitness_values = numpy.array([objf(Positions[i, :]) for i in range(SearchAgents_no)])
     
     # Initialize best solution
     best_idx = numpy.argmin(fitness_values)
@@ -46,10 +39,7 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     best_fitness = fitness_values[best_idx]
     
     # Initialize convergence curve
-    Convergence_curve = numpy.zeros(Max_iter)
-    Convergence_curve[0] = best_fitness  # Record initial best fitness
-    
-    s = solution()
+    convergence = []
     
     # Timer start
     print('LSHADE is optimizing  "' + objf.__name__ + '"')
@@ -63,8 +53,8 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         trial_population = numpy.zeros((current_pop_size, dim))
         
         for i in range(current_pop_size):
-            # Select parent indices - ensure we have enough population for selection
-            if current_pop_size < 4:  # Need at least 4 individuals for DE
+            # Select parent indices
+            if current_pop_size < 4:
                 parent_indices = [i]
                 while len(parent_indices) < 3:
                     idx = random.randint(0, current_pop_size - 1)
@@ -79,7 +69,7 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
             p_best_F = numpy.mean([memory[idx]["F"] for idx in memory_indices])
             p_best_CR = numpy.mean([memory[idx]["CR"] for idx in memory_indices])
             
-            # Generate mutant vector with normal distribution
+            # Generate parameters
             F = max(0, numpy.random.normal(p_best_F, 0.1))
             CR = max(0, numpy.random.normal(p_best_CR, 0.1))
             
@@ -100,51 +90,45 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
                 trial_population[i, j] = numpy.clip(trial_population[i, j], lb[j], ub[j])
         
         # Evaluate trial solutions
-        trial_fitness = numpy.zeros(current_pop_size)
-        for i in range(current_pop_size):
-            trial_fitness[i] = objf(trial_population[i, :])
+        trial_fitness = numpy.array([objf(trial_population[i, :]) for i in range(current_pop_size)])
             
-            # Selection
-            if trial_fitness[i] < fitness_values[i]:
-                Positions[i, :] = trial_population[i, :].copy()
-                fitness_values[i] = trial_fitness[i]
-                
-                if trial_fitness[i] < best_fitness:
-                    best_fitness = trial_fitness[i]
-                    best_solution = trial_population[i, :].copy()
+        # Selection
+        improved_indices = trial_fitness < fitness_values
+        Positions[improved_indices] = trial_population[improved_indices]
+        fitness_values[improved_indices] = trial_fitness[improved_indices]
+        
+        # Update best solution
+        current_best_idx = numpy.argmin(fitness_values)
+        if fitness_values[current_best_idx] < best_fitness:
+            best_fitness = fitness_values[current_best_idx]
+            best_solution = Positions[current_best_idx, :].copy()
         
         # Update memory
         sorted_indices = numpy.argsort(fitness_values)
         for i in range(min(memory_size, current_pop_size)):
-            memory[i]["F"] += 0.1 * (random.random() - 0.5)
-            memory[i]["CR"] += 0.1 * (random.random() - 0.5)
-            
-            # Ensure F and CR stay in [0,1]
-            memory[i]["F"] = numpy.clip(memory[i]["F"], 0, 1)
-            memory[i]["CR"] = numpy.clip(memory[i]["CR"], 0, 1)
+            memory[i]["F"] = numpy.clip(memory[i]["F"] + 0.1 * (random.random() - 0.5), 0, 1)
+            memory[i]["CR"] = numpy.clip(memory[i]["CR"] + 0.1 * (random.random() - 0.5), 0, 1)
         
         # Population reduction
         new_pop_size = max(4, round(SearchAgents_no - (SearchAgents_no - 4) * l / Max_iter))
         if new_pop_size < current_pop_size:
             current_pop_size = new_pop_size
-            Positions = Positions[sorted_indices[:current_pop_size], :]
+            Positions = Positions[sorted_indices[:current_pop_size]]
             fitness_values = fitness_values[sorted_indices[:current_pop_size]]
         
-        # Update convergence curve
-        Convergence_curve[l] = best_fitness
+        # Store convergence data
+        convergence.append(best_fitness)
         
-        if (l+1) % 500 == 0:
-            print(["At iteration " + str(l+1) + " the best fitness is " + str(best_fitness)])
+        if l % 1 == 0:
+            print(["At iteration " + str(l) + " the best fitness is " + str(best_fitness)])
     
     # Timer end
     timerEnd = time.time()
     s.endTime = time.strftime("%Y-%m-%d-%H-%M-%S")
     s.executionTime = timerEnd - timerStart
+    s.convergence = numpy.array(convergence)
     s.optimizer = "LSHADE"
     s.bestIndividual = best_solution
     s.objfname = objf.__name__
-    
-    # Store convergence data as numpy array
-    s.convergence = numpy.array(Convergence_curve)
     
     return s
