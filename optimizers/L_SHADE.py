@@ -4,7 +4,7 @@ import math
 from solution import solution
 import time
 
-def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
+def LSHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     """
     LSHADE (Linear Success-History based Adaptive Differential Evolution) implementation
     """
@@ -89,20 +89,16 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
             for j in range(dim):
                 trial_population[i, j] = numpy.clip(trial_population[i, j], lb[j], ub[j])
         
-        # Evaluate trial solutions
-        trial_fitness = numpy.array([objf(trial_population[i, :]) for i in range(current_pop_size)])
-            
-        # Selection
-        improved_indices = trial_fitness < fitness_values
-
-        Positions[improved_indices] = trial_population[improved_indices]
-        fitness_values[improved_indices] = trial_fitness[improved_indices]
-        
-        # Update best solution
-        current_best_idx = numpy.argmin(fitness_values)
-        if fitness_values[current_best_idx] < best_fitness:
-            best_fitness = fitness_values[current_best_idx]
-            best_solution = Positions[current_best_idx, :].copy()
+        # Evaluate trial solutions and perform selection
+        for i in range(current_pop_size):
+            trial_fitness_i = objf(trial_population[i, :])
+            if trial_fitness_i < fitness_values[i]:
+                Positions[i, :] = trial_population[i, :].copy()
+                fitness_values[i] = trial_fitness_i
+                
+                if trial_fitness_i < best_fitness:
+                    best_fitness = trial_fitness_i
+                    best_solution = trial_population[i, :].copy()
         
         # Update memory
         sorted_indices = numpy.argsort(fitness_values)
@@ -120,8 +116,8 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         # Store convergence data
         convergence.append(best_fitness)
         
-        if (l+1) % 500 == 0:
-            print(["At iteration " + str(l+1) + " the best fitness is " + str(best_fitness)])
+        if l % 1 == 0:
+            print(["At iteration " + str(l) + " the best fitness is " + str(best_fitness)])
     
     # Timer end
     timerEnd = time.time()
