@@ -88,7 +88,7 @@ def AO(F_obj, LB, UB, Dim, N, T):
                         Ffun[i] = Ffun_new[i]
 
         # Convergence update
-        if t % 100 == 0:
+        if t % 500 == 0:
             print(f'At iteration {t} the best solution fitness is {Best_FF}')
 
         Convergence_curve[t - 1] = Best_FF
