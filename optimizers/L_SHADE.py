@@ -43,10 +43,10 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
 
             # Ensure the mutant vector calculation handles fewer than 3 parents
             if len(parent_indices) == 3:
-            mutant_vector = population[parent_indices[0]] + F * (population[parent_indices[1]] - population[parent_indices[2]])
+                mutant_vector = population[parent_indices[0]] + F * (population[parent_indices[1]] - population[parent_indices[2]])
             else:
             # Handle case where fewer than 3 parents are selected, e.g., by using the same parent for mutation
-            mutant_vector = population[parent_indices[0]] + F * (population[parent_indices[0]] - population[parent_indices[0]])
+                mutant_vector = population[parent_indices[0]] + F * (population[parent_indices[0]] - population[parent_indices[0]])
 
                 
             p_best_F = np.mean([memory[idx]["F"] for idx in memory_indices])
