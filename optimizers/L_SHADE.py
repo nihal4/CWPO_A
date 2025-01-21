@@ -30,12 +30,14 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     for i in range(dim):
         Positions[:, i] = numpy.random.uniform(0, 1, SearchAgents_no) * (ub[i] - lb[i]) + lb[i]
     
-    # Initialize fitness values
-    fitness_values = numpy.array([objf(Positions[i, :]) for i in range(SearchAgents_no)])
+    # Initialize fitness values and arrays for single evaluations
+    fitness_values = numpy.zeros(SearchAgents_no)
+    for i in range(SearchAgents_no):
+        fitness_values[i] = objf(Positions[i])
     
     # Initialize best solution
     best_idx = numpy.argmin(fitness_values)
-    best_solution = Positions[best_idx, :].copy()
+    best_solution = Positions[best_idx].copy()
     best_fitness = fitness_values[best_idx]
     
     # Initialize convergence curve
@@ -73,32 +75,38 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
             F = max(0, numpy.random.normal(p_best_F, 0.1))
             CR = max(0, numpy.random.normal(p_best_CR, 0.1))
             
+            # Get parent vectors
+            x_i = Positions[i]
+            x_r1 = Positions[parent_indices[0]]
+            x_r2 = Positions[parent_indices[1]]
+            x_r3 = Positions[parent_indices[2]]
+            
             # Mutation
-            mutant_vector = Positions[parent_indices[0], :] + F * (
-                Positions[parent_indices[1], :] - Positions[parent_indices[2], :])
+            v_i = x_r1 + F * (x_r2 - x_r3)
             
             # Crossover
             j_rand = random.randint(0, dim-1)
-            trial_population[i] = Positions[i, :].copy()
+            trial_vector = x_i.copy()
             
             for j in range(dim):
                 if random.random() <= CR or j == j_rand:
-                    trial_population[i, j] = mutant_vector[j]
-                    
+                    trial_vector[j] = v_i[j]
+            
             # Boundary control
-            for j in range(dim):
-                trial_population[i, j] = numpy.clip(trial_population[i, j], lb[j], ub[j])
+            trial_vector = numpy.clip(trial_vector, lb, ub)
+            trial_population[i] = trial_vector
         
         # Evaluate trial solutions and perform selection
         for i in range(current_pop_size):
-            trial_fitness_i = objf(trial_population[i, :])
-            if trial_fitness_i < fitness_values[i]:
-                Positions[i, :] = trial_population[i, :].copy()
-                fitness_values[i] = trial_fitness_i
+            trial_fitness = objf(trial_population[i])
+            
+            if trial_fitness < fitness_values[i]:
+                Positions[i] = trial_population[i].copy()
+                fitness_values[i] = trial_fitness
                 
-                if trial_fitness_i < best_fitness:
-                    best_fitness = trial_fitness_i
-                    best_solution = trial_population[i, :].copy()
+                if trial_fitness < best_fitness:
+                    best_fitness = trial_fitness
+                    best_solution = trial_population[i].copy()
         
         # Update memory
         sorted_indices = numpy.argsort(fitness_values)
@@ -116,8 +124,8 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         # Store convergence data
         convergence.append(best_fitness)
         
-        if (l+1) % 500 == 0:
-            print(["At iteration " + str(l+1) + " the best fitness is " + str(best_fitness)])
+        if l % 1 == 0:
+            print(["At iteration " + str(l) + " the best fitness is " + str(best_fitness)])
     
     # Timer end
     timerEnd = time.time()
