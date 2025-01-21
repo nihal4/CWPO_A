@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import time
+from scipy.special import gamma
 from solution import solution
 
 def AO(F_obj, LB, UB, Dim, N, T):
@@ -106,7 +107,7 @@ def AO(F_obj, LB, UB, Dim, N, T):
 
 def Levy(d):
     beta = 1.5
-    sigma = (np.gamma(1 + beta) * np.sin(np.pi * beta / 2) / (np.gamma((1 + beta) / 2) * beta * 2 ** ((beta - 1) / 2))) ** (1 / beta)
+    sigma = (gamma(1 + beta) * np.sin(np.pi * beta / 2) / (gamma((1 + beta) / 2) * beta * 2 ** ((beta - 1) / 2))) ** (1 / beta)
     u = np.random.randn(d) * sigma
     v = np.random.randn(d)
     step = u / np.abs(v) ** (1 / beta)
