@@ -94,7 +94,8 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
             
         # Selection
         improved_indices = trial_fitness < fitness_values
-        Positions[improved_indices] = trial_population[improved_indices]
+        #Positions[improved_indices] = trial_population[improved_indices]
+        Positions[improved_indices, :] = trial_population[improved_indices, :] #2d problem
         fitness_values[improved_indices] = trial_fitness[improved_indices]
         
         # Update best solution
