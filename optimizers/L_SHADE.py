@@ -41,7 +41,12 @@ def LSHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
             parent_indices = np.random.choice(SearchAgents_no, 3, replace=False)
 
             # Select scaling factor and crossover rate
-            memory_indices = random.sample(range(min(memory_size, p_best_size)), p_best_size)
+            sample_size = min(memory_size, p_best_size)
+            if sample_size <= len(range(memory_size)):
+                memory_indices = random.sample(range(memory_size), sample_size)
+            else:
+                memory_indices = random.sample(range(memory_size), memory_size)
+                
             p_best_F = np.mean([memory[idx]["F"] for idx in memory_indices])
             p_best_CR = np.mean([memory[idx]["CR"] for idx in memory_indices])
 
