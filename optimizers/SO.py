@@ -3,7 +3,7 @@ import random
 import time
 from solution import solution
 
-def SO(N, T, fobj, dim, lb, ub):
+def SO(fobj, lb, ub, dim, N, T):
     # Initialize population
     X = np.random.uniform(lb, ub, (N, dim))
     fitness = np.zeros(N)
