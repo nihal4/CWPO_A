@@ -48,7 +48,8 @@ def GGO(objf, lb, ub, dim, SearchAgents_no, Max_iter):
             best_fitness = best_fitness_iter
             best_solution = population[np.argmin(fitness), :]
 
-        print(f"Iteration {iter + 1}: Best fitness = {best_fitness}")
+        if iter % 500 == 0:
+            print(f"Iteration {iter + 1}: Best fitness = {best_fitness}")
 
     # Timer end
     timerEnd = time.time()
