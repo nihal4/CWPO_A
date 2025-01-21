@@ -22,6 +22,7 @@ import optimizers.JAYA as jaya
 import optimizers.DE as de
 import optimizers.L_SHADE as lshade
 import optimizers.COA as coa
+import optimizers.ROA as roa
 import benchmarks
 import csv
 import numpy
@@ -74,6 +75,8 @@ def selector(algo, func_details, popSize, Iter):
         x = lshade.L_SHADE(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
     elif algo == "COA":
         x = coa.COA(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
+    elif algo == "ROA":
+        x = roa.ROA(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
     else:
         return null
     return x
