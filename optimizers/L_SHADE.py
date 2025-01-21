@@ -93,7 +93,8 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         trial_fitness = numpy.array([objf(trial_population[i, :]) for i in range(current_pop_size)])
             
         # Selection
-        improved_indices = trial_fitness < fitness_values
+        improved_indices = (trial_fitness < fitness_values).reshape(-1)
+
         #Positions[improved_indices] = trial_population[improved_indices]
         Positions[improved_indices, :] = trial_population[improved_indices, :] #2d problem
         fitness_values[improved_indices] = trial_fitness[improved_indices]
