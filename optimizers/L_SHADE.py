@@ -4,7 +4,7 @@ import math
 from solution import solution
 import time
 
-def LSHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
+def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     """
     LSHADE (Linear Success-History based Adaptive Differential Evolution) implementation
     """
@@ -119,8 +119,8 @@ def LSHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         # Store convergence data
         convergence.append(best_fitness)
         
-        if l % 1 == 0:
-            print(["At iteration " + str(l) + " the best fitness is " + str(best_fitness)])
+        if (l+1) % 500 == 0:
+            print(["At iteration " + str(l+1) + " the best fitness is " + str(best_fitness)])
     
     # Timer end
     timerEnd = time.time()
