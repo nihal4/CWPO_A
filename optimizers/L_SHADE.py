@@ -55,7 +55,7 @@ def L_SHADE(objf, lb, ub, dim, population_size,max_iter):
 
         for i in range(population_size):
             # Select parent indices
-            parent_indices = random.sample(range(population_size), 3)
+            parent_indices = random.sample(range(population_size), min(3, population_size))
 
             # Select scaling factor and crossover rate
             memory_indices = random.sample(range(memory_size), p_best_size)
