@@ -153,24 +153,19 @@ def run(optimizer, objectivefunc, NumOfRuns, params, export_flags):
 
             if Export == True:
                 ExportToFile = results_directory + "experiment.csv"
-
                 with open(ExportToFile, "a", newline="\n") as out:
                     writer = csv.writer(out, delimiter=",")
-                    if (
-                        Flag == False
-                    ):  # just one time to write the header of the CSV file
-                        header = numpy.concatenate(
-                            [["Optimizer", "objfname", "ExecutionTime"], CnvgHeader]
-                        )
+                    if Flag == False:  # Write the header only once
+                        header = ["Optimizer", "objfname", "Avg_Min", "Std_Min"]
                         writer.writerow(header)
                         Flag = True
-
-                    avgExecutionTime = float("%0.2f" % (sum(executionTime) / NumOfRuns))
-                    avgConvergence = numpy.around(
-                        numpy.mean(convergence, axis=0, dtype=numpy.float64), decimals=2
-                    ).tolist()
-                    a = numpy.concatenate([[optimizerName, objfname, avgExecutionTime], avgConvergence])
-                    writer.writerow(a)
+                        
+                    min_values = [min(run) for run in convergence]
+                    
+                    avg_min = numpy.mean(min_values)
+                    std_min = numpy.std(min_values)
+                    
+                    writer.writerow([optimizerName, objfname, avg_min, std_min])
                 out.close()
 
     if Export_convergence == True:
