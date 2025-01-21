@@ -4,7 +4,7 @@ import math
 from solution import solution
 import time
 
-def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
+def LSHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     """
     LSHADE (Linear Success-History based Adaptive Differential Evolution) implementation
     
@@ -61,11 +61,19 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         trial_population = numpy.zeros((current_pop_size, dim))
         
         for i in range(current_pop_size):
-            # Select parent indices
-            parent_indices = random.sample(range(current_pop_size), 3)
+            # Select parent indices - ensure we have enough population for selection
+            if current_pop_size < 4:  # Need at least 4 individuals for DE
+                parent_indices = [i]
+                while len(parent_indices) < 3:
+                    idx = random.randint(0, current_pop_size - 1)
+                    if idx not in parent_indices:
+                        parent_indices.append(idx)
+            else:
+                parent_indices = random.sample(range(current_pop_size), 3)
             
             # Select scaling factor and crossover rate
-            memory_indices = random.sample(range(memory_size), p_best_size)
+            memory_indices = random.sample(range(min(memory_size, current_pop_size)), 
+                                        min(p_best_size, min(memory_size, current_pop_size)))
             p_best_F = numpy.mean([memory[idx]["F"] for idx in memory_indices])
             p_best_CR = numpy.mean([memory[idx]["CR"] for idx in memory_indices])
             
@@ -114,14 +122,16 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
             memory[i]["CR"] = numpy.clip(memory[i]["CR"], 0, 1)
         
         # Population reduction
-        current_pop_size = max(2, round(current_pop_size - H * l / Max_iter))
-        Positions = Positions[sorted_indices[:current_pop_size], :]
-        fitness_values = fitness_values[sorted_indices[:current_pop_size]]
+        new_pop_size = max(4, round(SearchAgents_no - (SearchAgents_no - 4) * l / Max_iter))
+        if new_pop_size < current_pop_size:
+            current_pop_size = new_pop_size
+            Positions = Positions[sorted_indices[:current_pop_size], :]
+            fitness_values = fitness_values[sorted_indices[:current_pop_size]]
         
         # Update convergence curve
         Convergence_curve[l] = best_fitness
         
-        if l % 500 == 0:
+        if (l+1) % 500 == 0:
             print(["At iteration " + str(l) + " the best fitness is " + str(best_fitness)])
     
     # Timer end
