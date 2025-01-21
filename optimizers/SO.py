@@ -143,7 +143,8 @@ def SO(fobj, lb, ub, dim, N, T):
             Xfood = Xbest_f
 
         gbest_t[t] = GYbest
-        print(f"Iteration {t+1}: Best fitness = {GYbest}")
+        if (t+1)%500==0:
+            print(f"Iteration {t+1}: Best fitness = {GYbest}")
 
     # Timer end
     timerEnd = time.time()
