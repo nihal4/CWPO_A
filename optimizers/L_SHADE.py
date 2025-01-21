@@ -133,19 +133,18 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         # Update convergence curve
         Convergence_curve[l] = best_fitness
         
-        if l+1 % 500 == 0:
+        if (l+1) % 500 == 0:
             print(["At iteration " + str(l+1) + " the best fitness is " + str(best_fitness)])
     
     # Timer end
     timerEnd = time.time()
     s.endTime = time.strftime("%Y-%m-%d-%H-%M-%S")
     s.executionTime = timerEnd - timerStart
-    s.convergence = Convergence_curve
     s.optimizer = "LSHADE"
     s.bestIndividual = best_solution
     s.objfname = objf.__name__
     
-    # Ensure the convergence data is properly filled
-    s.convergence = Convergence_curve.tolist()  # Convert to list for consistency
+    # Store convergence data as numpy array
+    s.convergence = numpy.array(Convergence_curve)
     
     return s
