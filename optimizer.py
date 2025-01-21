@@ -20,6 +20,7 @@ import optimizers.HHO as hho
 import optimizers.SCA as sca
 import optimizers.JAYA as jaya
 import optimizers.DE as de
+import optimizers.L_SHADE as lshade
 import benchmarks
 import csv
 import numpy
@@ -68,6 +69,8 @@ def selector(algo, func_details, popSize, Iter):
         x = de.DE(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
     elif algo == "GWO":
         x = gwo.GWO(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
+    elif algo == "L_SHADE":
+        x = lshade.L_SHADE(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
     else:
         return null
     return x
