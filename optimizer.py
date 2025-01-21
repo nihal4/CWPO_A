@@ -168,11 +168,11 @@ def run(optimizer, objectivefunc, NumOfRuns, params, export_flags):
                     writer.writerow([optimizerName, objfname, avg_min, std_min])
                 out.close()
 
-    if Export_convergence == True:
-        conv_plot.run(results_directory, optimizer, objectivefunc, Iterations)
+    #if Export_convergence == True:
+    #    conv_plot.run(results_directory, optimizer, objectivefunc, Iterations)
 
-    if Export_boxplot == True:
-        box_plot.run(results_directory, optimizer, objectivefunc, Iterations)
+    #if Export_boxplot == True:
+    #    box_plot.run(results_directory, optimizer, objectivefunc, Iterations)
 
     if Flag == False:  # Faild to run at least one experiment
         print(
