@@ -174,7 +174,7 @@ def run(optimizer, objectivefunc, NumOfRuns, params, export_flags):
                         writer.writerow(header)
                         Flag = True
 
-                    min_values = [min(run) for run in convergence if run]  # Safeguard against empty runs
+                    min_values = [min(run) for run in convergence if len(run) > 0]  # Ensure non-empty lists
                     avg_min = numpy.mean(min_values)
                     std_min = numpy.std(min_values)
                     writer.writerow([optimizerName, objfname, avg_min, std_min])
