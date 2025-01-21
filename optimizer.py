@@ -24,6 +24,7 @@ import optimizers.L_SHADE as lshade
 import optimizers.COA as coa
 import optimizers.ROA as roa
 import optimizers.GGO as ggo
+import optimizers.SO as so
 import benchmarks
 import csv
 import numpy
@@ -80,6 +81,8 @@ def selector(algo, func_details, popSize, Iter):
         x = roa.ROA(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
     elif algo == "GGO":
         x = ggo.GGO(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
+    elif algo == "SO":
+        x = so.SO(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
     else:
         return null
     return x
