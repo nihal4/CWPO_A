@@ -140,13 +140,13 @@ def run(optimizer, objectivefunc, NumOfRuns, params, export_flags):
 
     for optimizer_name in optimizer:
         for objective in objectivefunc:
-            convergence = [0] * NumOfRuns
+            convergence = [[] for _ in range(NumOfRuns)]  # Initialize as list of lists
             executionTime = [0] * NumOfRuns
 
             for run_idx in range(NumOfRuns):
                 func_details = benchmarks.getFunctionDetails(objective)
                 x = selector(optimizer_name, func_details, PopulationSize, Iterations)
-                convergence[run_idx] = x.convergence
+                convergence[run_idx] = x.convergence  # Populate convergence for each run
                 optimizerName = x.optimizer
                 objfname = x.objfname
 
@@ -164,20 +164,20 @@ def run(optimizer, objectivefunc, NumOfRuns, params, export_flags):
                         row = [x.optimizer, x.objfname, x.executionTime, x.bestIndividual] + x.convergence.tolist()
                         writer.writerow(row)
 
-                # Export summary results
-                if Export:
-                    ExportToFile = results_directory + "experiment.csv"
-                    with open(ExportToFile, "a", newline="") as out:
-                        writer = csv.writer(out, delimiter=",")
-                        if not Flag:  # Write the header once
-                            header = ["Optimizer", "objfname", "Avg_Min", "Std_Min"]
-                            writer.writerow(header)
-                            Flag = True
+            # Export summary results
+            if Export:
+                ExportToFile = results_directory + "experiment.csv"
+                with open(ExportToFile, "a", newline="") as out:
+                    writer = csv.writer(out, delimiter=",")
+                    if not Flag:  # Write the header once
+                        header = ["Optimizer", "objfname", "Avg_Min", "Std_Min"]
+                        writer.writerow(header)
+                        Flag = True
 
-                        min_values = [min(run) for run in convergence]
-                        avg_min = numpy.mean(min_values)
-                        std_min = numpy.std(min_values)
-                        writer.writerow([optimizerName, objfname, avg_min, std_min])
+                    min_values = [min(run) for run in convergence if run]  # Safeguard against empty runs
+                    avg_min = numpy.mean(min_values)
+                    std_min = numpy.std(min_values)
+                    writer.writerow([optimizerName, objfname, avg_min, std_min])
 
     # Optional: Export convergence and box plots
     if Export_convergence:
