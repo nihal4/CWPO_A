@@ -101,8 +101,8 @@ def COA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
 
         # Record convergence
 
-        if t % 500 == 0:
-            print(f'At iteration {t} the best solution fitness is {fbest}')
+        if (t+1) % 500 == 0:
+            print(f'At iteration {t+1} the best solution fitness is {fbest}')
             
         convergence_curve[t - 1] = fbest
 
