@@ -41,7 +41,7 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     best_fitness = fitness_values[best_idx]
     
     # Initialize convergence curve
-    convergence = []
+    convergence = numpy.zeros(Max_iter)
     
     # Timer start
     print('LSHADE is optimizing  "' + objf.__name__ + '"')
