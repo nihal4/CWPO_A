@@ -122,7 +122,7 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
             fitness_values = fitness_values[sorted_indices[:current_pop_size]]
         
         # Store convergence data
-        convergence.append(best_fitness)
+        convergence[l] = best_fitness
         
         if l % 1 == 0:
             print(best_fitness)
