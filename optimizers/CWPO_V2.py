@@ -67,7 +67,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
             best_fitness_in_range = objf(Positions[i])
             best_position_in_range = Positions[i].copy()
 
-            for angle in range(0, 181):  # 0 to 180 degrees
+            for angle in range(0, 361):  # 0 to 180 degrees
                 candidate_position = rotate_position(Positions[i], angle)
                 candidate_position = np.clip(candidate_position, lb, ub)  # Keep within bounds
                 candidate_fitness = objf(candidate_position)
