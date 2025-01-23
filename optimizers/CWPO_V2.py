@@ -64,8 +64,9 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda_min=0.5, levy
             current_fitness = objf(current_position)
 
             # Try Levy flight to explore new position
-            levy_lambda = np.random.uniform(levy_lambda_min, levy_lambda_max)  # Varying Levy flight parameter
+              # Varying Levy flight parameter
             while True:
+                levy_lambda = np.random.uniform(levy_lambda_min, levy_lambda_max)
                 levy_step = levy_flight(levy_lambda)
                 new_position = Alpha_pos * levy_step + np.random.rand(dim)
                 new_position = np.clip(new_position, lb, ub)  # Ensure bounds
