@@ -108,7 +108,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda_min=0.5, levy
 
         Convergence_curve[l] = Alpha_score
 
-        if (l + 1) % 500 == 0:
+        if (l + 1) % 1 == 0:
             print(f"At iteration {l + 1}, the best fitness is {Alpha_score}")
 
     timerEnd = time.time()
