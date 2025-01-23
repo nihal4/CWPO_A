@@ -1,5 +1,5 @@
 
-
+"""
 #V4
 import numpy as np
 import time
@@ -111,9 +111,9 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
 
     return s
 
-
-
 """
+
+
 #v3
 import numpy as np
 import time
@@ -221,7 +221,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
 
     return s
 
-"""
+
 """
 #version V2
 import numpy as np
