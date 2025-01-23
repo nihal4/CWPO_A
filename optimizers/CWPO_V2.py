@@ -53,10 +53,10 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
             # Compare with the best solution
             if Alpha_score < fitness:
                 # Use Equation (1) to update the position
-                Positions[i] = Alpha_pos + np.random.rand(0,1)
+                Positions[i] = Alpha_pos + np.random.rand()
             else:
                 # Use Equation (2) to update the position
-                Positions[i] = Alpha_pos * levy_step + np.random.rand(0,1)
+                Positions[i] = Alpha_pos * levy_step + np.random.rand()
 
             # Ensure position stays within bounds
             Positions[i] = np.clip(Positions[i], lb, ub)
