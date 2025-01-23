@@ -13,7 +13,7 @@ def levy_flight(lam):
     return step[0]
 
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=2):
     """
     Cat Water Phobia Optimizer (CWPO) - Pseudocode Structure
     objf: Objective function
