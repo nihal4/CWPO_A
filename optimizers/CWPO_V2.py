@@ -2,7 +2,6 @@ import numpy as np
 import time
 from solution import solution
 
-
 def levy_flight(lam):
     """Generate a Levy flight step."""
     sigma = (np.math.gamma(1 + lam) * np.sin(np.pi * lam / 2) /
@@ -11,7 +10,6 @@ def levy_flight(lam):
     v = np.random.normal(0, 1, 1)
     step = u / abs(v) ** (1 / lam)
     return step[0]
-
 
 def rotate_position(position, angle):
     """Rotate the position vector by the given angle (in degrees)."""
@@ -25,10 +23,9 @@ def rotate_position(position, angle):
         return np.concatenate((rotated, position[2:]))
     return position
 
-
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda_min=0.5, levy_lambda_max=1.7):
     """
-    Cat Water Phobia Optimizer (CWPO) with 180-degree position search and improved global position update.
+    Cat Water Phobia Optimizer (CWPO) with dynamic Levy flight parameter and revisit prevention.
     
     objf: Objective function
     lb: Lower bound
@@ -36,7 +33,8 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
     dim: Number of dimensions
     SearchAgents_no: Population size
     Max_iter: Maximum iterations
-    levy_lambda: Levy flight parameter
+    levy_lambda_min: Minimum Levy flight parameter
+    levy_lambda_max: Maximum Levy flight parameter
     """
     
     # Initialize population X with given bounds and random values
@@ -51,6 +49,9 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
     Convergence_curve = np.zeros(Max_iter)
     s = solution()
 
+    # Track visited positions
+    visited_positions = set()
+
     # Start optimization
     print('CWPO is optimizing "' + objf.__name__ + '"')
     timerStart = time.time()
@@ -62,22 +63,28 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
             current_position = Positions[i].copy()
             current_fitness = objf(current_position)
 
+            # Try Levy flight to explore new position
+            levy_lambda = np.random.uniform(levy_lambda_min, levy_lambda_max)  # Varying Levy flight parameter
             while True:
-                # Generate a new position using Levy flight and random exploration
                 levy_step = levy_flight(levy_lambda)
                 new_position = Alpha_pos * levy_step + np.random.rand(dim)
                 new_position = np.clip(new_position, lb, ub)  # Ensure bounds
 
-                # Evaluate the fitness of the new position
+                # Prevent revisiting the same position
+                new_position_tuple = tuple(np.round(new_position, decimals=5))  # Using rounded tuple for precision
+                if new_position_tuple in visited_positions:
+                    continue  # Skip if the position has been visited before
+
+                # Evaluate fitness of the new position
                 new_fitness = objf(new_position)
 
                 if new_fitness < current_fitness:
-                    # If the new position is better, accept it
+                    # If new position improves fitness, accept it
                     Positions[i] = new_position
-                    current_fitness = new_fitness
+                    visited_positions.add(new_position_tuple)
                     break  # Exit the retry loop
                 else:
-                    # Optionally, try small perturbations if fitness is not improving
+                    # If no improvement, try perturbing the position slightly
                     new_position = current_position + np.random.uniform(-0.01, 0.01, dim)
                     new_position = np.clip(new_position, lb, ub)
 
@@ -113,6 +120,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
     s.objfname = objf.__name__
 
     return s
+
 
 """
 #v3
