@@ -17,7 +17,7 @@ def dynamic_hazard(cat_pos, objf):
     hazard = objf(cat_pos)
     return hazard
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.5, sf=5.0):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=5, sf=5.0):
     """
     Cat Water Phobia Optimizer (CWPO)
     objf: Objective function
