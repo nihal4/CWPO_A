@@ -26,10 +26,18 @@ def hazard_function(alpha, beta, cat_pos, local_minima, levy_lambda):
     levy_randomness = beta * levy_flight(levy_lambda)
     return alpha * distance_to_minima + levy_randomness
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha_start=1.5, alpha_end=0.5,
-                  beta_start=0.5, beta_end=0.1, levy_lambda=1.5, elite_fraction=0.1):
+def add_escape_strategy(Positions, fitness_values, global_best_pos, escape_factor=0.1):
     """
-    Enhanced CWPO with dynamic parameters, elite preservation, and adaptive mechanisms.
+    Introduce an escape mechanism to prevent getting trapped in local minima.
+    """
+    perturbation = escape_factor * np.random.uniform(-1, 1, Positions.shape)
+    Positions += perturbation * (Positions - global_best_pos)
+    return Positions
+
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha_start=1.5, alpha_end=0.5,
+                  beta_start=0.5, beta_end=0.1, levy_lambda=1.5, elite_fraction=0.1, escape_factor=0.1):
+    """
+    Enhanced CWPO with dynamic parameters, elite preservation, adaptive mechanisms, and escape strategy.
     objf: Objective function
     lb: Lower bound
     ub: Upper bound
@@ -42,6 +50,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha_start=1.5, alpha_en
     beta_end: Final hazard fluctuation factor
     levy_lambda: Levy flight parameter
     elite_fraction: Fraction of elite solutions to preserve
+    escape_factor: Factor to control the escape strategy
     """
 
     # Initialize population
@@ -109,6 +118,9 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha_start=1.5, alpha_en
             if Elite_scores[j] < objf(Positions[rand_idx]):
                 Positions[rand_idx] = Elite_archive[j]
 
+        # Escape strategy to avoid local minima
+        Positions = add_escape_strategy(Positions, Convergence_curve, Alpha_pos, escape_factor)
+
         Convergence_curve[l] = Alpha_score
 
         if (l + 1) % 500 == 0:
@@ -118,7 +130,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha_start=1.5, alpha_en
     s.endTime = time.strftime("%Y-%m-%d-%H-%M-%S")
     s.executionTime = timerEnd - timerStart
     s.convergence = Convergence_curve
-    s.optimizer = "Enhanced CWPO with Levy"
+    s.optimizer = "Enhanced CWPO with Escape Strategy"
     s.bestIndividual = Alpha_pos
     s.objfname = objf.__name__
 
