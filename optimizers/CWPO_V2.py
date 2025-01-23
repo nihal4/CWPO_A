@@ -65,7 +65,8 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda_min=0.5, levy
 
             # Try Levy flight to explore new position
             levy_lambda = np.random.uniform(levy_lambda_min, levy_lambda_max)  # Varying Levy flight parameter
-            while True:
+
+            for _ in range(100):  # Limit to 100 iterations to find a valid position
                 levy_step = levy_flight(levy_lambda)
                 new_position = Alpha_pos * levy_step + np.random.rand(dim)
                 new_position = np.clip(new_position, lb, ub)  # Ensure bounds
@@ -108,7 +109,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda_min=0.5, levy
 
         Convergence_curve[l] = Alpha_score
 
-        if (l + 1) % 1 == 0:
+        if (l + 1) % 500 == 0:
             print(f"At iteration {l + 1}, the best fitness is {Alpha_score}")
 
     timerEnd = time.time()
@@ -120,6 +121,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda_min=0.5, levy
     s.objfname = objf.__name__
 
     return s
+
 
 
 """
