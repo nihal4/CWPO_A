@@ -103,7 +103,7 @@ from solution import solution
 
 
 def levy_flight(lam):
-    """Generate a Levy flight step."""
+    #Generate a Levy flight step.
     sigma = (np.math.gamma(1 + lam) * np.sin(np.pi * lam / 2) /
              (np.math.gamma((1 + lam) / 2) * lam * 2 ** ((lam - 1) / 2))) ** (1 / lam)
     u = np.random.normal(0, sigma, 1)
@@ -113,7 +113,7 @@ def levy_flight(lam):
 
 
 def rotate_position(position, angle):
-    """Rotate the position vector by the given angle (in degrees)."""
+    #Rotate the position vector by the given angle (in degrees).
     radians = np.radians(angle)
     rotation_matrix = np.array([
         [np.cos(radians), -np.sin(radians)],
@@ -126,16 +126,16 @@ def rotate_position(position, angle):
 
 
 def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
-    """
-    Cat Water Phobia Optimizer (CWPO) with 180-degree position search
-    objf: Objective function
-    lb: Lower bound
-    ub: Upper bound
-    dim: Number of dimensions
-    SearchAgents_no: Population size
-    Max_iter: Maximum iterations
-    levy_lambda: Levy flight parameter
-    """
+    
+    #Cat Water Phobia Optimizer (CWPO) with 180-degree position search
+    #objf: Objective function
+    #lb: Lower bound
+    #ub: Upper bound
+    #dim: Number of dimensions
+    #SearchAgents_no: Population size
+    #Max_iter: Maximum iterations
+    #levy_lambda: Levy flight parameter
+    
 
     # Initialize population X with given bounds and random values
     Positions = np.zeros((SearchAgents_no, dim))
@@ -204,6 +204,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
     return s
 
 
+"""
 """
 #version V2
 import numpy as np
