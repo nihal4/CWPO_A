@@ -13,7 +13,7 @@ def levy_flight(lam):
     return step[0]
 
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=2):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=1.7):
     """
     Cat Water Phobia Optimizer (CWPO) - Pseudocode Structure
     objf: Objective function
@@ -53,10 +53,10 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, levy_lambda=2):
             # Compare with the best solution
             if Alpha_score < fitness:
                 # Use Equation (1) to update the position
-                Positions[i] = Alpha_pos + np.random.rand()
+                Positions[i] = Alpha_pos + np.random.rand(-1,1)
             else:
                 # Use Equation (2) to update the position
-                Positions[i] = Alpha_pos * levy_step + np.random.rand()
+                Positions[i] = Alpha_pos * levy_step + np.random.rand(-1,1)
 
             # Ensure position stays within bounds
             Positions[i] = np.clip(Positions[i], lb, ub)
