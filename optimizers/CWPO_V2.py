@@ -8,24 +8,42 @@ import numpy as np
 import time
 from solution import solution
 
-def gaussian_random_walk(sigma):
-    """Generate a Gaussian random step."""
-    return np.random.normal(0, sigma, 1)[0]
+def levy_flight(lam):
+    """Generate a Levy flight step."""
+    sigma = (np.math.gamma(1 + lam) * np.sin(np.pi * lam / 2) /
+             (np.math.gamma((1 + lam) / 2) * lam * 2 ** ((lam - 1) / 2))) ** (1 / lam)
+    u = np.random.normal(0, sigma, 1)
+    v = np.random.normal(0, 1, 1)
+    step = u / abs(v) ** (1 / lam)
+    return step[0]
 
-def hazard_function(alpha, beta, cat_pos, local_minima, sigma):
+def hazard_function(alpha, beta, cat_pos, local_minima, levy_lambda):
     """
     Calculate the environmental hazard.
-    EH = alpha * abs(C_i - LM) + beta * Gaussian(sigma)
+    EH = alpha * abs(C_i - LM) + beta * Levy(lambda)
     """
     distance_to_minima = np.abs(cat_pos - local_minima)
-    gaussian_randomness = beta * gaussian_random_walk(sigma)
-    return alpha * distance_to_minima + gaussian_randomness
+    levy_randomness = beta * levy_flight(levy_lambda)
+    return alpha * distance_to_minima + levy_randomness
 
 def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha_start=1.5, alpha_end=0.5,
-                  beta_start=0.5, beta_end=0.1, sigma_start=1.0, sigma_end=0.1, elite_fraction=0.1):
+                  beta_start=0.5, beta_end=0.1, levy_lambda=1.5, elite_fraction=0.1):
     """
     Enhanced CWPO with dynamic parameters, elite preservation, and adaptive mechanisms.
+    objf: Objective function
+    lb: Lower bound
+    ub: Upper bound
+    dim: Number of dimensions
+    SearchAgents_no: Population size
+    Max_iter: Maximum iterations
+    alpha_start: Initial hazard impact scaling factor
+    alpha_end: Final hazard impact scaling factor
+    beta_start: Initial hazard fluctuation factor
+    beta_end: Final hazard fluctuation factor
+    levy_lambda: Levy flight parameter
+    elite_fraction: Fraction of elite solutions to preserve
     """
+
     # Initialize population
     Positions = np.zeros((SearchAgents_no, dim))
     for i in range(dim):
@@ -51,14 +69,19 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha_start=1.5, alpha_en
         # Dynamic parameter tuning
         alpha = alpha_start - (alpha_start - alpha_end) * (l / Max_iter)
         beta = beta_start - (beta_start - beta_end) * (l / Max_iter)
-        sigma = sigma_start - (sigma_start - sigma_end) * (l / Max_iter)
 
         # Update local minima dynamically
         local_minima = Alpha_pos.copy()
 
         for i in range(SearchAgents_no):
             # Calculate environmental hazard
-            hazard_effect = hazard_function(alpha, beta, Positions[i], local_minima, sigma)
+            hazard_effect = hazard_function(
+                alpha=alpha,
+                beta=beta,
+                cat_pos=Positions[i],
+                local_minima=local_minima,
+                levy_lambda=levy_lambda
+            )
 
             # Update position using exploration and hazard exploitation
             Positions[i] = Positions[i] - hazard_effect
@@ -95,9 +118,8 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha_start=1.5, alpha_en
     s.endTime = time.strftime("%Y-%m-%d-%H-%M-%S")
     s.executionTime = timerEnd - timerStart
     s.convergence = Convergence_curve
-    s.optimizer = "Enhanced CWPO"
+    s.optimizer = "Enhanced CWPO with Levy"
     s.bestIndividual = Alpha_pos
     s.objfname = objf.__name__
 
     return s
-
