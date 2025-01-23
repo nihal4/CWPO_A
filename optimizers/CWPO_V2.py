@@ -8,25 +8,20 @@ import numpy as np
 import time
 from solution import solution
 
-def levy_flight(lam):
-    """Generate a Levy flight step."""
-    sigma = (np.math.gamma(1 + lam) * np.sin(np.pi * lam / 2) /
-             (np.math.gamma((1 + lam) / 2) * lam * 2 ** ((lam - 1) / 2))) ** (1 / lam)
-    u = np.random.normal(0, sigma, 1)
-    v = np.random.normal(0, 1, 1)
-    step = u / abs(v) ** (1 / lam)
-    return step[0]
+def gaussian_random_walk(sigma):
+    """Generate a Gaussian random step."""
+    return np.random.normal(0, sigma, 1)[0]
 
-def hazard_function(alpha, beta, cat_pos, local_minima, levy_lambda):
+def hazard_function(alpha, beta, cat_pos, local_minima, sigma):
     """
     Calculate the environmental hazard.
-    EH = alpha * abs(C_i - LM) + beta * Levy(lambda)
+    EH = alpha * abs(C_i - LM) + beta * Gaussian(sigma)
     """
     distance_to_minima = np.abs(cat_pos - local_minima)
-    levy_randomness = beta * levy_flight(levy_lambda)
-    return alpha * distance_to_minima + levy_randomness
+    gaussian_randomness = beta * gaussian_random_walk(sigma)
+    return alpha * distance_to_minima + gaussian_randomness
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=.5, beta=1.5, levy_lambda=1.5):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=1.5, beta=0.5, sigma=1.0):
     """
     Cat Water Phobia Optimizer (CWPO)
     objf: Objective function
@@ -37,7 +32,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=.5, beta=1.5, levy_
     Max_iter: Maximum iterations
     alpha: Hazard impact scaling factor
     beta: Hazard fluctuation factor
-    levy_lambda: Levy flight parameter
+    sigma: Standard deviation for Gaussian random walk
     """
 
     # Initialize population
@@ -68,7 +63,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=.5, beta=1.5, levy_
                 beta=beta,
                 cat_pos=Positions[i],
                 local_minima=local_minima,
-                levy_lambda=levy_lambda
+                sigma=sigma
             )
 
             # Update position using exploration and hazard exploitation
