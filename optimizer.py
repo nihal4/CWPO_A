@@ -87,7 +87,7 @@ def selector(algo, func_details, popSize, Iter):
         x = so.SO(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
     elif algo == "AO":
         x = ao.AO(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
-    elif algo == "CWPO_V2:
+    elif algo == "CWPO_V2":
         x = cwpo_v2.CWPO(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
     else:
         return null
