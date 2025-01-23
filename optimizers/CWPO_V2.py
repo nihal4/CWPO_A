@@ -26,7 +26,7 @@ def hazard_function(alpha, beta, cat_pos, local_minima, levy_lambda):
     levy_randomness = beta * levy_flight(levy_lambda)
     return alpha * distance_to_minima + levy_randomness
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=1.5, beta=0.5, levy_lambda=1.5):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=.5, beta=1.5, levy_lambda=1.5):
     """
     Cat Water Phobia Optimizer (CWPO)
     objf: Objective function
