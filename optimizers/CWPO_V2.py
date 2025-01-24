@@ -29,7 +29,7 @@ def dynamic_hazard(t, omega, alpha, beta, p, cat_pos, hazard_pos, fitness, max_f
     adaptation_factor = 1 - (fitness / max_fitness)
     return hazard_intensity * adaptation_factor
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omega_freq=0.1, sf=5.0, levy_lambda=1.7, p=-1.5, resource_update_interval=50, num_subgroups=3, exchange_interval=100, elite_reinforcement_interval=25, elite_influence=0.2):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omega_freq=0.1, sf=5.0, levy_lambda=1.7, p=-1.5, resource_update_interval=50, num_subgroups=5, exchange_interval=100, elite_reinforcement_interval=25, elite_influence=0.2):
     """
     Cat Water Phobia Optimizer (CWPO) with Historical Memory, Resource Redistribution, Multi-Population Mechanism, Elite Reinforcement, and Fitness-Based Hazard Adaptation
     objf: Objective function
