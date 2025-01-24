@@ -45,7 +45,7 @@ def CWPO(objf, lb, ub, dim, Population_size, Max_iter):
 
             fitness = objf(Cats[i, :])
 
-        EH = update_hazards(Cats, EH, t, alpha=1.0, beta=0.5, omega=0.1, p=2)
+        EH = update_hazards(Cats, EH, t, alpha=1.0, beta=0.5, omega=0.1, p=2, dim=dim)
 
         for i in range(Population_size):
             Cats[i, :] = update_position(Cats[i, :], EH[i], R, dim, sf=1.0, lam=1.5)
@@ -65,15 +65,15 @@ def CWPO(objf, lb, ub, dim, Population_size, Max_iter):
 
     return s
 
-def update_hazards(Cats, EH, t, alpha, beta, omega, p):
+def update_hazards(Cats, EH, t, alpha, beta, omega, p, dim):
     for i in range(len(Cats)):
-        dynamic_hazard = alpha * np.linalg.norm(Cats[i] - random_hazard(t), ord=p)
+        dynamic_hazard = alpha * np.linalg.norm(Cats[i] - random_hazard(t, dim), ord=p)
         periodic_fluctuation = beta * math.cos(omega * t)
         EH[i] = dynamic_hazard + periodic_fluctuation
     return EH
 
-def random_hazard(t):
-    return np.array([math.sin(t), math.cos(t)])
+def random_hazard(t, dim):
+    return np.array([math.sin(t + i) for i in range(dim)])
 
 def update_position(Cat, EH, R, dim, sf, lam):
     Levy = levy_flight(lam)
