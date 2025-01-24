@@ -13,6 +13,12 @@ import time
 
 def CWPO(objf, lb, ub, dim, Population_size, Max_iter):
 
+    # Ensure lb and ub are lists
+    if isinstance(lb, (int, float)):
+        lb = [lb] * dim
+    if isinstance(ub, (int, float)):
+        ub = [ub] * dim
+
     # Initialize population and parameters
     Cats = np.zeros((Population_size, dim))
     for i in range(dim):
