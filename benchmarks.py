@@ -20,7 +20,7 @@ def Ufun(x, a, k, m):
     y = k * ((x - a) ** m) * (x > a) + k * ((-x - a) ** m) * (x < (-a))
     return y
 
-
+"""
 def F1(x):
     s = numpy.sum(x ** 2)
     return s
@@ -360,8 +360,8 @@ def getFunctionDetails(a):
         "F23": ["F23", 0, 10, 4],
     }
     return param.get(a, "nothing")
+"""
 
-'''
 # ESAs space mission design benchmarks https://www.esa.int/gsp/ACT/projects/gtop/
 from fcmaes.astro import (
     MessFull,
@@ -456,4 +456,3 @@ def getFunctionDetails(a):
         ],
     }
     return param.get(a, "nothing")
-'''
