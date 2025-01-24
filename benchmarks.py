@@ -20,7 +20,7 @@ def Ufun(x, a, k, m):
     y = k * ((x - a) ** m) * (x > a) + k * ((-x - a) ** m) * (x < (-a))
     return y
 
-"""
+
 def F1(x):
     s = numpy.sum(x ** 2)
     return s
@@ -331,7 +331,7 @@ def F23(L):
         fit = fit - ((v) * (v.T) + cSH[i]) ** (-1)
     o = fit.item(0)
     return o
-
+"""
 def getFunctionDetails(a):
     # [name, lb, ub, dim]
     param = {
