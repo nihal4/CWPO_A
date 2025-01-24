@@ -9,6 +9,7 @@ import optimizers.PSO as pso
 import optimizers.MVO as mvo
 import optimizers.CWPO as CWPO
 import optimizers.CWPO_V2 as cwpo_v2
+import optimizers.CWPO_V2_Ca as cwpo_v2_ca
 import optimizers.GWO as gwo
 import optimizers.MFO as mfo
 import optimizers.CS as cs
@@ -89,6 +90,8 @@ def selector(algo, func_details, popSize, Iter):
         x = ao.AO(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
     elif algo == "CWPO_V2":
         x = cwpo_v2.CWPO(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
+    elif algo == "CWPO_V2_CA":
+        x = cwpo_v2_ca.CWPO(getattr(benchmarks, function_name), lb, ub, dim, popSize, Iter)
     else:
         return null
     return x
