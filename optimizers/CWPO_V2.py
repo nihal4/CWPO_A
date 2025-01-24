@@ -17,7 +17,7 @@ def levy_flight(lam, DIM, s=0.01):
     
     return step
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, f=.5, levy_lam=1.7, beta=1.5):
+def CWOP(objf, lb, ub, dim, SearchAgents_no, Max_iter, f, levy_lam, beta):
 
     if not isinstance(lb, list):
         lb = [lb] * dim
@@ -29,14 +29,6 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, f=.5, levy_lam=1.7, beta=
     for i in range(dim):
         cats[:, i] = np.random.uniform(0, 1, SearchAgents_no) * (ub[i] - lb[i]) + lb[i]
 
-            # Calculate fitness of all cats
-    cat_fitness = np.array([objf(ind) for ind in cats])
-
-        # Find the best cat
-    best_cat_index = np.argmin(cat_fitness)
-    cat_best = cats[best_cat_index].copy()
-    best_fitness = cat_fitness[best_cat_index]
-    
     Convergence_curve = np.zeros(Max_iter)
     s = solution()
 
@@ -51,7 +43,13 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, f=.5, levy_lam=1.7, beta=
     omega = 2 * np.pi * f
 
     while t <= Max_iter:
+        # Calculate fitness of all cats
+        cat_fitness = np.array([objf(ind) for ind in cats])
 
+        # Find the best cat
+        best_cat_index = np.argmin(cat_fitness)
+        cat_best = cats[best_cat_index].copy()
+        best_fitness = cat_fitness[best_cat_index]
 
         # Update positions of cats
         for i in range(SearchAgents_no):
