@@ -17,7 +17,7 @@ def levy_flight(lam, DIM, s=0.01):
     
     return step
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, f, levy_lam, beta):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, f=.5, levy_lam=1.7, beta=1.5):
 
     if not isinstance(lb, list):
         lb = [lb] * dim
