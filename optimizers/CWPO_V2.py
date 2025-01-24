@@ -3,7 +3,7 @@ import math
 import time
 from solution import solution
 
-def levy_flight(lam, DIM, s=0.01):
+def levy_flight(lam, DIM, s=1.6):
     """Generate a Levy flight step for given lam and dimensionality DIM."""
     sigma = (math.gamma(1 + lam) * np.sin(np.pi * lam / 2) /
              (math.gamma((1 + lam) / 2) * lam * 2 ** ((lam - 1) / 2))) ** (1 / lam)
