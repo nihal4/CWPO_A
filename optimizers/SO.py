@@ -1,3 +1,4 @@
+"""
 import numpy as np
 import random
 import time
@@ -320,7 +321,6 @@ def SO(fobj, lb, ub, dim, N, T):
     s.objfname = fobj.__name__
 
     return s
-"""
 """
 
 #for F1-23
