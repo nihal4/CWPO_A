@@ -393,7 +393,7 @@ def Gt1(x):
 import numpy as np
 
 def cec01(x):
-    dim = 9
+    dim = 30
     p1 = 0.0
     p2 = 0.0
     p3 = 0.0
@@ -462,7 +462,7 @@ def getFunctionDetails(a):
         "F21": ["F21", 0, 10, 4],
         "F22": ["F22", 0, 10, 4],
         "F23": ["F23", 0, 10, 4],
-        "cec01":["cec01", -100, 100, 9],
+        "cec01":["cec01", -10, 10, 30],
         "Ca1": [
             "Ca1",
             Cassini1().bounds.lb,
