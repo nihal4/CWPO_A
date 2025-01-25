@@ -390,6 +390,52 @@ def Mes(x):
 def Gt1(x):
     return Gtoc1().fun(x)
 
+import numpy as np
+
+def cec01(x):
+    dim = 9
+    p1 = 0.0
+    p2 = 0.0
+    p3 = 0.0
+    d = 72.661
+    u = 0.0
+    v = 0.0
+    wk = 0.0
+    pk = 0.0
+    m = 32 * dim
+
+    # Calculate u
+    for i in range(dim):
+        u += x[i] * (1.2)**(dim - i - 1)
+    if u < d:
+        p1 = (u - d)**2
+
+    # Calculate v
+    for i in range(dim):
+        v += x[i] * (-1.2)**(dim - i - 1)
+    if v < d:
+        p2 = (v - d)**2
+
+    # Calculate pk and p3
+    for k in range(m + 1):
+        for i in range(dim):
+            wk += x[i] * ((2 * k / m) - 1)**(dim - i - 1)
+        if wk > d:
+            pk += (wk - d)**2
+        elif wk < d:
+            pk += (wk + d)**2
+        else:
+            pk += 0.0
+        wk = 0.0  # Reset wk for the next iteration
+
+    p3 = pk
+
+    # Final output
+    o = p1 + p2 + p3
+    return o
+
+
+
 def getFunctionDetails(a):
     # [name, lb, ub, dim]
     param = {
@@ -416,6 +462,7 @@ def getFunctionDetails(a):
         "F21": ["F21", 0, 10, 4],
         "F22": ["F22", 0, 10, 4],
         "F23": ["F23", 0, 10, 4],
+        "cec01":["cec01", -100, 100, 9],
         "Ca1": [
             "Ca1",
             Cassini1().bounds.lb,
