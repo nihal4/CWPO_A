@@ -434,7 +434,20 @@ def cec01(x):
     o = p1 + p2 + p3
     return o
 
-
+def cec02(x):
+    n = int(np.sqrt(16))  # Compute the square root of 16, assuming `n` is 4
+    W = 0.0  # Initialize W to 0
+    for i in range(1, n + 1):  # Loop from 1 to n
+        xi = x[i - 1]  # Get the i-th element of x
+        for k in range(1, n + 1):  # Nested loop from 1 to n
+            if i == k:
+                I = 1
+            else:
+                I = 0
+            H = 1 / (i + k - 1)  # Calculate H
+            Z = xi + (n * (k - 1))  # Calculate Z
+            W += abs(H * Z - I)  # Update W with the absolute value of the expression
+    return W  # Return the final value of W
 
 def getFunctionDetails(a):
     # [name, lb, ub, dim]
@@ -463,6 +476,7 @@ def getFunctionDetails(a):
         "F22": ["F22", 0, 10, 4],
         "F23": ["F23", 0, 10, 4],
         "cec01":["cec01", 0, 10, 4],
+        "cec02":["cec01", 0, 10, 4],
         "Ca1": [
             "Ca1",
             Cassini1().bounds.lb,
