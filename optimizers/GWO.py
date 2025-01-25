@@ -30,7 +30,7 @@ def GWO(objf, lb, ub, dim, SearchAgents_no, Max_iter):
 
     Delta_pos = numpy.zeros(dim)
     Delta_score = float("inf")
-    """
+    
     if not isinstance(lb, list):
         lb = [lb] * dim
     if not isinstance(ub, list):
@@ -38,6 +38,7 @@ def GWO(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     """
     ub = np.array(ub)
     lb = np.array(lb)
+    """
     # Initialize the positions of search agents
     Positions = numpy.zeros((SearchAgents_no, dim))
     for i in range(dim):
