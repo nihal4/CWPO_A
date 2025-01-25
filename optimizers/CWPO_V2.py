@@ -63,7 +63,8 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
     # Initialize population, hazards, and resources
     Positions = np.zeros((SearchAgents_no, dim))
     for i in range(dim):
-        Positions[:, i] = (np.random.uniform(0, 1, SearchAgents_no) * (ub[i] - lb[i]) + lb[i])
+        Positions[:, i] = (np.random.uniform(0, 1, SearchAgents_no) * (ub[i] - lb[i]) + lb[i]) #For Ca1-Gt1
+        #Positions[:, i] = np.random.uniform(0, 1, SearchAgents_no) * (ub - lb) + lb for F1-F23
 
     Hazards = np.random.uniform(lb, ub, (SearchAgents_no, dim))
     Resources = np.random.uniform(lb, ub, (SearchAgents_no, dim))
