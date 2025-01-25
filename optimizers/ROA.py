@@ -61,8 +61,8 @@ def ROA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
                 Remora[j, :] = BestRemora - (
                     (random.random() * (BestRemora + Remora[m, :]) / 2) - Remora[m, :]
                 )  # Equation (1)
-        if t % 500 == 0:
-            print(f"Iteration : {t}, best score : {Score}")
+        if (t+1) % 500 == 0:
+            print(f"Iteration : {t+1}, best score : {Score}")
             
         t += 1
         
