@@ -24,7 +24,11 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         lb = [lb] * dim
     if not isinstance(ub, list):
         ub = [ub] * dim
-        
+
+    #new line
+    lb = numpy.array(lb)
+    ub = numpy.array(ub)
+    
     # Initialize population
     Positions = numpy.zeros((SearchAgents_no, dim))
     for i in range(dim):
