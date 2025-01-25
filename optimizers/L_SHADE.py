@@ -1,5 +1,6 @@
 import random
 import numpy
+import numpy as np
 import math
 from solution import solution
 import time
