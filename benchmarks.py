@@ -453,6 +453,7 @@ def cec03(x):
     n = int(18 / 3)  # Compute n as 18 divided by 3
     d = 0.0  # Initialize d to 0
     total_sum = 0.0  # Initialize sum to 0 (renamed to avoid shadowing built-in `sum`)
+    epsilon = 1e-10  # Small constant to prevent division by zero
 
     for i in range(1, n):  # Loop from 1 to n-1
         xi = x[3 * i - 2]  # Access the (3*i-1)-th element (adjusted for Python indexing)
@@ -461,11 +462,13 @@ def cec03(x):
             xj = x[3 * j - 2]  # Access the (3*j-1)-th element (adjusted for Python indexing)
             for k in range(3):  # Loop from 0 to 2
                 tmp += (xi + k - 2 - (xj + k - 2))**2  # Update tmp with the squared difference
-            d += tmp**3  # Add the cube of tmp to d
-            total_sum += (1 / d**2) - (2 / d)  # Update the total sum
+            d = tmp**3  # Calculate d as tmp^3
+            if d > 0:  # Only update if d > 0 to avoid division by zero
+                total_sum += (1 / (d + epsilon)**2) - (2 / (d + epsilon))  # Add epsilon to avoid zero
 
     o = 12.7120622568 + total_sum  # Add the constant value to the total sum
     return o  # Return the result
+
 
 def getFunctionDetails(a):
     # [name, lb, ub, dim]
