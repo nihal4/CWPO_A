@@ -40,7 +40,7 @@ def adapt_parameters(iteration, max_iter, alpha, beta, omega_freq, sf, levy_lamb
     levy_lambda *= (1 - iteration / max_iter * 0.5)  # Decrease levy_lambda for smaller steps
     return alpha, beta, omega_freq, sf, levy_lambda
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omega_freq=0.1, sf=5.0, levy_lambda=1.7, p=-1.5, resource_update_interval=10, num_subgroups=6, exchange_interval=10, elite_reinforcement_interval=5, elite_influence=0.2):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omega_freq=0.1, sf=5.0, levy_lambda=1.7, p=-1.5, resource_update_interval=10, num_subgroups=6, exchange_interval=10, elite_reinforcement_interval=5, elite_influence=0.7):
     """
     Cat Water Phobia Optimizer (CWPO) with Historical Memory, Resource Redistribution, Multi-Population Mechanism, Elite Reinforcement, Fitness-Based Hazard Adaptation, and Dynamic Parameter Adaptation
     objf: Objective function
