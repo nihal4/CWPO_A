@@ -1,3 +1,4 @@
+'''
 import numpy as np
 import random
 import time
@@ -235,7 +236,6 @@ def Levy(d):
     v = np.random.randn(d)
     step = u / np.abs(v) ** (1 / beta)
     return step
-'''
 
 def initialization(N, Dim, UB, LB):
     """Random initialization of search agents' positions."""
