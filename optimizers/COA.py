@@ -22,6 +22,7 @@ def COA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     s = solution()
     print(f'COA is optimizing "{objf.__name__}"')
 
+    """
     # Ensure bounds are lists for each dimension
     if not isinstance(lb, list):
         lb = [lb] * dim
@@ -30,7 +31,18 @@ def COA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
 
     lb = np.array(lb)
     ub = np.array(ub)
+    """
+    ub = np.array(ub)
+    lb = np.array(lb)
 
+    """
+    if ub.shape == () and lb.shape == ():  # Scalars
+        Positions = np.random.uniform(0, 1, (SearchAgents_no, dim)) * (ub - lb) + lb
+    elif ub.shape[0] == dim and lb.shape[0] == dim:  # Arrays of length `dim`
+        Positions = np.random.uniform(0, 1, (SearchAgents_no, dim)) * (ub - lb) + lb
+    else:
+        raise ValueError("Bounds `ub` and `lb` must be either scalars or arrays of the same length as `dim")
+    """
     # Initialize the population
     X = np.random.uniform(lb, ub, (SearchAgents_no, dim))
     fit = np.array([objf(ind) for ind in X])
