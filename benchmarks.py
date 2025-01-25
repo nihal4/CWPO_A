@@ -476,7 +476,7 @@ def getFunctionDetails(a):
         "F22": ["F22", 0, 10, 4],
         "F23": ["F23", 0, 10, 4],
         "cec01":["cec01", 0, 10, 4],
-        "cec02":["cec02", 0, 10, 4],
+        "cec02":["cec02", -100, 100, 30],
         "Ca1": [
             "Ca1",
             Cassini1().bounds.lb,
