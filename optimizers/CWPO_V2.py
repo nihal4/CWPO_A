@@ -60,12 +60,20 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
     ub = np.array(ub)
     lb = np.array(lb)
     
-    # Initialize population, hazards, and resources
+    # Initialize population, hazards, and resource
+    if ub.shape == () and lb.shape == ():  # Scalars
+        Positions = np.random.uniform(0, 1, (SearchAgents_no, dim)) * (ub - lb) + lb
+    elif ub.shape[0] == dim and lb.shape[0] == dim:  # Arrays of length `dim`
+        Positions = np.random.uniform(0, 1, (SearchAgents_no, dim)) * (ub - lb) + lb
+    else:
+        raise ValueError("Bounds `ub` and `lb` must be either scalars or arrays of the same length as `dim")
+
+    """
     Positions = np.zeros((SearchAgents_no, dim))
     for i in range(dim):
         Positions[:, i] = (np.random.uniform(0, 1, SearchAgents_no) * (ub[i] - lb[i]) + lb[i]) #For Ca1-Gt1
         #Positions[:, i] = np.random.uniform(0, 1, SearchAgents_no) * (ub - lb) + lb for F1-F23
-
+    """
     Hazards = np.random.uniform(lb, ub, (SearchAgents_no, dim))
     Resources = np.random.uniform(lb, ub, (SearchAgents_no, dim))
 
