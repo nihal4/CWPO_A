@@ -20,19 +20,15 @@ def L_SHADE(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     # Initialize memory
     memory = [{"F": 0.5, "CR": 0.5} for _ in range(memory_size)]
     
-    if not isinstance(lb, list):
-        lb = [lb] * dim
-    if not isinstance(ub, list):
-        ub = [ub] * dim
+    ub = np.array(ub)
+    lb = np.array(lb)
 
-    #new line
-    lb = numpy.array(lb)
-    ub = numpy.array(ub)
-    
-    # Initialize population
-    Positions = numpy.zeros((SearchAgents_no, dim))
-    for i in range(dim):
-        Positions[:, i] = numpy.random.uniform(0, 1, SearchAgents_no) * (ub[i] - lb[i]) + lb[i]
+    if ub.shape == () and lb.shape == ():  # Scalars
+        Positions = np.random.uniform(0, 1, (SearchAgents_no, dim)) * (ub - lb) + lb
+    elif ub.shape[0] == dim and lb.shape[0] == dim:  # Arrays of length `dim`
+        Positions = np.random.uniform(0, 1, (SearchAgents_no, dim)) * (ub - lb) + lb
+    else:
+        raise ValueError("Bounds `ub` and `lb` must be either scalars or arrays of the same length as `dim")
     
     # Initialize fitness values and arrays for single evaluations
     fitness_values = numpy.zeros(SearchAgents_no)
