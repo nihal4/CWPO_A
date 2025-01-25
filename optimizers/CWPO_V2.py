@@ -56,6 +56,10 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
     # Calculate angular frequency
     omega = 2 * np.pi * omega_freq
 
+    #keep in bound and dimention problem fixed
+    ub = np.array(ub)
+    lb = np.array(lb)
+    
     # Initialize population, hazards, and resources
     Positions = np.zeros((SearchAgents_no, dim))
     for i in range(dim):
