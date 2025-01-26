@@ -239,6 +239,6 @@ def Levy(d):
     return step
 
 def initialization(N, Dim, UB, LB):
-    """Random initialization of search agents' positions."""
+    #Random initialization of search agents positions.
     return np.random.uniform(LB, UB, (N, Dim))
 """
