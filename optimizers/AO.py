@@ -1,4 +1,4 @@
-'''
+
 import numpy as np
 import random
 import time
@@ -120,7 +120,8 @@ def initialization(N, Dim, UB, LB):
     """Random initialization of search agents' positions."""
     return np.random.uniform(LB, UB, (N, Dim))
 
-'''
+
+"""
 #for F1-Gt1
 import numpy as np
 import random
@@ -240,3 +241,4 @@ def Levy(d):
 def initialization(N, Dim, UB, LB):
     """Random initialization of search agents' positions."""
     return np.random.uniform(LB, UB, (N, Dim))
+"""
