@@ -70,6 +70,12 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
     min_population = 10  # Minimum population size
     reduction_schedule = np.linspace(initial_population, min_population, Max_iter).astype(int)
 
+    # **SHPA parameters**
+    sf_memory = [sf]  # Search radius memory
+    levy_lambda_memory = [levy_lambda]  # Levy flight parameter memory
+    elite_influence_memory = [elite_influence]  # Elite influence memory
+    adaptation_rate = 0.9  # Weighted averaging factor for SHPA
+
     # Start optimization
     print('CWPO is optimizing "' + objf.__name__ + '"')
     timerStart = time.time()
@@ -105,14 +111,14 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
 
                 # Localized search
                 distances_to_resources = np.linalg.norm(Resources - Positions[i], axis=1)
-                nearby_resources = Resources[distances_to_resources <= sf]
+                nearby_resources = Resources[distances_to_resources <= sf_memory[-1]]  # Use SHPA-adapted `sf`
                 if nearby_resources.size > 0:
                     local_search = nearby_resources.mean(axis=0)
                 else:
                     local_search = np.zeros(dim)
 
                 # Update position using exploration equation and historical memory
-                inertia = Positions[i] * levy_flight(levy_lambda)
+                inertia = Positions[i] * levy_flight(levy_lambda_memory[-1])  # Use SHPA-adapted `levy_lambda`
                 memory_influence = (Personal_best[i] - Positions[i]) * np.random.random()
                 Positions[i] += inertia + memory_influence - hazard_effect + local_search
 
@@ -126,6 +132,11 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
                 if fitness < Personal_best_scores[i]:
                     Personal_best_scores[i] = fitness
                     Personal_best[i] = Positions[i].copy()
+
+                    # Update SHPA memory based on success
+                    sf_memory.append(adaptation_rate * sf_memory[-1] + (1 - adaptation_rate) * sf_memory[-1] * 1.1)
+                    levy_lambda_memory.append(adaptation_rate * levy_lambda_memory[-1] + (1 - adaptation_rate) * levy_lambda_memory[-1] * 0.9)
+                    elite_influence_memory.append(adaptation_rate * elite_influence_memory[-1] + (1 - adaptation_rate) * elite_influence_memory[-1] * 1.05)
 
                 # Update the global best solution
                 if fitness < Alpha_score:
@@ -148,7 +159,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
         # Apply elite reinforcement periodically
         if l % elite_reinforcement_interval == 0:
             for i in range(current_population):
-                elite_influence_vector = elite_influence * (Alpha_pos - Positions[i]) * np.random.random()
+                elite_influence_vector = elite_influence_memory[-1] * (Alpha_pos - Positions[i]) * np.random.random()
                 Positions[i] += elite_influence_vector
                 Positions[i] = np.clip(Positions[i], lb, ub)
 
@@ -166,6 +177,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
     s.objfname = objf.__name__
 
     return s
+
 
 """
 #best_parameter
