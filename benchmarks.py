@@ -774,45 +774,7 @@ def cec10(x):
     
     return result
 
-def PressureVesselDesign(x):
-    # Check if x is a 1D array
-    if x.ndim == 1:
-        # If x is 1D, we assume it's a vector with 4 values
-        y1 = x[0]  # Ts
-        y2 = x[1]  # Th
-        y3 = x[2]  # R
-        y4 = x[3]  # L
-    else:
-        # If x is 2D, then index as usual
-        y1 = x[:, 0]  # Ts
-        y2 = x[:, 1]  # Th
-        y3 = x[:, 2]  # R
-        y4 = x[:, 3]  # L
 
-    # Objective function calculation
-    fx = 0.6224 * y1 * y3 * y4 + \
-         1.7781 * y2 * y3**2 + \
-         3.1661 * y1**2 * y4 + \
-         19.84 * y1**2 * y3
-
-    # Constraints
-    g = np.zeros((x.shape[0], 4))  # Initialize g
-    g[:, 0] = -y1 + 0.0193 * y3
-    g[:, 1] = -y2 + 0.0095 * y3
-    g[:, 2] = -np.pi * y3**2 * y4 - (4 / 3) * np.pi * y3**3 + 1296000
-    g[:, 3] = y4 - 240
-
-    # Penalty for constraint violation
-    pp = 10**9
-    penalty = np.zeros_like(g)
-    for i in range(g.shape[0]):
-        for j in range(g.shape[1]):
-            if g[i, j] > 0:
-                penalty[i, j] = pp * g[i, j]
-
-    # Return the objective function value plus the penalty sum
-    out = fx + np.sum(penalty, axis=1)
-    return out
 
 
 def getFunctionDetails(a):
@@ -851,12 +813,6 @@ def getFunctionDetails(a):
         "cec08":["cec08", -100, 100, 10],
         "cec09":["cec09", -100, 100, 10],
         "cec10":["cec10", -100, 100, 10],
-        "PressureVesselDesign": [
-            "PressureVesselDesign", 
-            np.array([0.0625, 0.0625, 10, 10]),  # Lower bounds as numpy array
-            np.array([99*0.0625, 99*0.0625, 200, 200]),  # Upper bounds as numpy array
-            4  # Dimension
-        ],
         "Ca1": [
             "Ca1",
             Cassini1().bounds.lb,
