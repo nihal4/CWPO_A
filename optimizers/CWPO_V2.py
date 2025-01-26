@@ -32,7 +32,7 @@ def dynamic_hazard(t, omega, alpha, beta, p, cat_pos, hazard_pos, fitness, max_f
     adaptation_factor = 1 - (fitness / max_fitness)
     return hazard_intensity * adaptation_factor
 
-def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omega_freq=0.1, sf=5.0, levy_lambda=1.7, p=-1.5, resource_update_interval=10, num_subgroups=6, exchange_interval=10, elite_reinforcement_interval=5, elite_influence=0.7):
+def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omega_freq=0.1, sf=5.0, levy_lambda=1.7, p=-1.5, resource_update_interval=10, num_subgroups=6, exchange_interval=10, elite_reinforcement_interval=5, elite_influence=0.7, archive_size=50, archive_replacement_interval=20, F=0.5, CR=0.7):
     # Calculate angular frequency
     omega = 2 * np.pi * omega_freq
 
@@ -45,7 +45,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
     elif ub.shape[0] == dim and lb.shape[0] == dim:  # Arrays of length `dim`
         Positions = np.random.uniform(0, 1, (SearchAgents_no, dim)) * (ub - lb) + lb
     else:
-        raise ValueError("Bounds `ub` and `lb` must be either scalars or arrays of the same length as `dim")
+        raise ValueError("Bounds `ub` and `lb` must be either scalars or arrays of the same length as `dim`")
 
     Hazards = np.random.uniform(lb, ub, (SearchAgents_no, dim))
     Resources = np.random.uniform(lb, ub, (SearchAgents_no, dim))
@@ -58,6 +58,10 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
     Alpha_pos = np.zeros(dim)
     Alpha_score = float("inf")
 
+    # Initialize the archive
+    Archive = []
+    Archive_scores = []
+
     Convergence_curve = np.zeros(Max_iter)
     s = solution()
 
@@ -65,37 +69,20 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
     subgroup_size = SearchAgents_no // num_subgroups
     subgroups = [list(range(i * subgroup_size, (i + 1) * subgroup_size)) for i in range(num_subgroups)]
 
-    # **Population size reduction parameters**
-    initial_population = SearchAgents_no
-    min_population = 10  # Minimum population size
-    reduction_schedule = np.linspace(initial_population, min_population, Max_iter).astype(int)
-
-    # **SHPA parameters**
-    sf_memory = [sf]  # Search radius memory
-    levy_lambda_memory = [levy_lambda]  # Levy flight parameter memory
-    elite_influence_memory = [elite_influence]  # Elite influence memory
-    adaptation_rate = 0.9  # Weighted averaging factor for SHPA
-
     # Start optimization
     print('CWPO is optimizing "' + objf.__name__ + '"')
     timerStart = time.time()
     s.startTime = time.strftime("%Y-%m-%d-%H-%M-%S")
 
     for l in range(Max_iter):
-        # **Update active population size**
-        current_population = reduction_schedule[l]
-
         # Redistribute resources periodically
         if l % resource_update_interval == 0:
             Resources = np.random.uniform(lb, ub, (SearchAgents_no, dim))
 
-        max_fitness = max(Personal_best_scores[:current_population]) if max(Personal_best_scores) != float("inf") else 1
+        max_fitness = max(Personal_best_scores) if max(Personal_best_scores) != float("inf") else 1
 
         for subgroup in subgroups:
             for i in subgroup:
-                if i >= current_population:  # Skip agents outside the current population size
-                    continue
-
                 # Dynamic environmental hazard with fitness-based adaptation
                 hazard_effect = dynamic_hazard(
                     t=l,
@@ -111,61 +98,71 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
 
                 # Localized search
                 distances_to_resources = np.linalg.norm(Resources - Positions[i], axis=1)
-                nearby_resources = Resources[distances_to_resources <= sf_memory[-1]]  # Use SHPA-adapted `sf`
+                nearby_resources = Resources[distances_to_resources <= sf]
                 if nearby_resources.size > 0:
                     local_search = nearby_resources.mean(axis=0)
                 else:
                     local_search = np.zeros(dim)
 
-                # Update position using exploration equation and historical memory
-                inertia = Positions[i] * levy_flight(levy_lambda_memory[-1])  # Use SHPA-adapted `levy_lambda`
-                memory_influence = (Personal_best[i] - Positions[i]) * np.random.random()
-                Positions[i] += inertia + memory_influence - hazard_effect + local_search
+                # Differential Mutation Hybridization
+                if len(Archive) > 2:
+                    # Randomly select three solutions (r1, r2, r3) from the archive
+                    r1, r2, r3 = np.random.choice(len(Archive), 3, replace=False)
+                    mutant = Archive[r1] + F * (Archive[r2] - Archive[r3])
+                else:
+                    # If the archive is too small, use random population solutions
+                    idxs = np.random.choice(SearchAgents_no, 3, replace=False)
+                    r1, r2, r3 = idxs
+                    mutant = Positions[r1] + F * (Positions[r2] - Positions[r3])
 
-                # Ensure position stays within bounds
-                Positions[i] = np.clip(Positions[i], lb, ub)
+                # Crossover between the current solution and the mutant
+                crossover_mask = np.random.rand(dim) < CR
+                trial = np.where(crossover_mask, mutant, Positions[i])
 
-                # Calculate fitness
-                fitness = objf(Positions[i])
+                # Ensure trial vector stays within bounds
+                trial = np.clip(trial, lb, ub)
 
-                # Update personal bests
-                if fitness < Personal_best_scores[i]:
-                    Personal_best_scores[i] = fitness
-                    Personal_best[i] = Positions[i].copy()
+                # Calculate fitness of the trial vector
+                trial_fitness = objf(trial)
 
-                    # Update SHPA memory based on success
-                    sf_memory.append(adaptation_rate * sf_memory[-1] + (1 - adaptation_rate) * sf_memory[-1] * 1.1)
-                    levy_lambda_memory.append(adaptation_rate * levy_lambda_memory[-1] + (1 - adaptation_rate) * levy_lambda_memory[-1] * 0.9)
-                    elite_influence_memory.append(adaptation_rate * elite_influence_memory[-1] + (1 - adaptation_rate) * elite_influence_memory[-1] * 1.05)
+                # Replacement: Update if trial is better
+                if trial_fitness < Personal_best_scores[i]:
+                    if len(Archive) < archive_size:
+                        Archive.append(Positions[i].copy())
+                        Archive_scores.append(Personal_best_scores[i])
+                    else:
+                        # Replace the oldest solution in the archive
+                        Archive.pop(0)
+                        Archive_scores.pop(0)
+                        Archive.append(Positions[i].copy())
+                        Archive_scores.append(Personal_best_scores[i])
+
+                    Positions[i] = trial.copy()
+                    Personal_best_scores[i] = trial_fitness
+                    Personal_best[i] = trial.copy()
 
                 # Update the global best solution
-                if fitness < Alpha_score:
-                    Alpha_score = fitness
-                    Alpha_pos = Positions[i].copy()
+                if trial_fitness < Alpha_score:
+                    Alpha_score = trial_fitness
+                    Alpha_pos = trial.copy()
 
-        # Exchange information among subgroups periodically
-        if l % exchange_interval == 0:
-            for subgroup in subgroups:
-                best_in_subgroup = min(subgroup, key=lambda idx: Personal_best_scores[idx])
-                for other_subgroup in subgroups:
-                    if subgroup != other_subgroup:
-                        for idx in other_subgroup:
-                            if idx >= current_population:
-                                continue
-                            if Personal_best_scores[best_in_subgroup] < Personal_best_scores[idx]:
-                                Personal_best[idx] = Personal_best[best_in_subgroup].copy()
-                                Personal_best_scores[idx] = Personal_best_scores[best_in_subgroup]
+        # Reintroduce solutions from the archive periodically
+        if l % archive_replacement_interval == 0 and len(Archive) > 0:
+            for i in range(SearchAgents_no):
+                if np.random.random() < 0.1:  # Small probability to replace
+                    archive_idx = np.random.randint(len(Archive))
+                    Positions[i] = Archive[archive_idx].copy()
 
         # Apply elite reinforcement periodically
         if l % elite_reinforcement_interval == 0:
-            for i in range(current_population):
-                elite_influence_vector = elite_influence_memory[-1] * (Alpha_pos - Positions[i]) * np.random.random()
+            for i in range(SearchAgents_no):
+                elite_influence_vector = elite_influence * (Alpha_pos - Positions[i]) * np.random.random()
                 Positions[i] += elite_influence_vector
                 Positions[i] = np.clip(Positions[i], lb, ub)
 
         Convergence_curve[l] = Alpha_score
 
-        if (l+1) % 500 == 0:
+        if (l + 1) % 500 == 0:
             print(f"At iteration {l + 1}, the best fitness is {Alpha_score}")
 
     timerEnd = time.time()
@@ -177,6 +174,7 @@ def CWPO(objf, lb, ub, dim, SearchAgents_no, Max_iter, alpha=0.1, beta=0.5, omeg
     s.objfname = objf.__name__
 
     return s
+
 
 
 """
