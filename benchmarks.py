@@ -846,7 +846,12 @@ def getFunctionDetails(a):
         "cec08":["cec08", -100, 100, 10],
         "cec09":["cec09", -100, 100, 10],
         "cec10":["cec10", -100, 100, 10],
-        "PressureVesselDesign":["PressureVesselDesign", [0.0625, 0.0625, 10, 10], [99*0.0625, 99*0.0625, 200, 200], 4],
+        "PressureVesselDesign": [
+            "PressureVesselDesign", 
+            np.array([0.0625, 0.0625, 10, 10]),  # Lower bounds as numpy array
+            np.array([99*0.0625, 99*0.0625, 200, 200]),  # Upper bounds as numpy array
+            4  # Dimension
+        ],
         "Ca1": [
             "Ca1",
             Cassini1().bounds.lb,
