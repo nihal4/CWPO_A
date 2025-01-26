@@ -846,7 +846,7 @@ def getFunctionDetails(a):
         "cec08":["cec08", -100, 100, 10],
         "cec09":["cec09", -100, 100, 10],
         "cec10":["cec10", -100, 100, 10],
-        "PressureVesselDesign":["PressureVesselDesign", [0.0625 0.0625 10 10], [99*0.0625 99*0.0625 200 200], 4],
+        "PressureVesselDesign":["PressureVesselDesign", [0.0625, 0.0625, 10, 10], [99*0.0625, 99*0.0625, 200, 200], 4],
         "Ca1": [
             "Ca1",
             Cassini1().bounds.lb,
