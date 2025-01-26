@@ -775,40 +775,45 @@ def cec10(x):
     return result
 
 def PressureVesselDesign(x):
-    # Extract values from input array
-    y1 = x[:, 0]  # Ts
-    y2 = x[:, 1]  # Th
-    y3 = x[:, 2]  # R
-    y4 = x[:, 3]  # L
-    
-    # Objective function
+    # Check if x is a 1D array
+    if x.ndim == 1:
+        # If x is 1D, we assume it's a vector with 4 values
+        y1 = x[0]  # Ts
+        y2 = x[1]  # Th
+        y3 = x[2]  # R
+        y4 = x[3]  # L
+    else:
+        # If x is 2D, then index as usual
+        y1 = x[:, 0]  # Ts
+        y2 = x[:, 1]  # Th
+        y3 = x[:, 2]  # R
+        y4 = x[:, 3]  # L
+
+    # Objective function calculation
     fx = 0.6224 * y1 * y3 * y4 + \
          1.7781 * y2 * y3**2 + \
          3.1661 * y1**2 * y4 + \
          19.84 * y1**2 * y3
-    
+
     # Constraints
-    g = np.zeros((x.shape[0], 4))
+    g = np.zeros((x.shape[0], 4))  # Initialize g
     g[:, 0] = -y1 + 0.0193 * y3
     g[:, 1] = -y2 + 0.0095 * y3
-    g[:, 2] = -np.pi * y3**2 * y4 - (4/3) * np.pi * y3**3 + 1296000
+    g[:, 2] = -np.pi * y3**2 * y4 - (4 / 3) * np.pi * y3**3 + 1296000
     g[:, 3] = y4 - 240
-    
-    # Penalty function
+
+    # Penalty for constraint violation
     pp = 10**9
     penalty = np.zeros_like(g)
-    
     for i in range(g.shape[0]):
         for j in range(g.shape[1]):
             if g[i, j] > 0:
                 penalty[i, j] = pp * g[i, j]
-            else:
-                penalty[i, j] = 0
-    
-    # Return the final objective with penalties
+
+    # Return the objective function value plus the penalty sum
     out = fx + np.sum(penalty, axis=1)
-    
     return out
+
 
 def getFunctionDetails(a):
     # [name, lb, ub, dim]
